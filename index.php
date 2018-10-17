@@ -1,6 +1,6 @@
 <?php
     session_start();
-    include "../../dbConnection.php";
+    include "dbConnection.php";
     $dbConn = getDatabaseConnection("sports");
     
     if (!isset($_SESSION["scart"])) {
