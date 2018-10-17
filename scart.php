@@ -17,10 +17,14 @@
             $subtotal += $item['price'];
             $i++;
         }
+        echo "<a href='index.php'>Back to Shopping</a><br>";
         echo "<form class='button' method='POST'>
-            <input type='submit' name='removeBtn' value='Empty'>
+            <input type='submit' name='removeBtn' value='Empty Cart'>
             </form><br>";
         echo "Subtotal: $$subtotal<br>";
+    }
+    else{
+        echo "<a href='index.php'>Back to Shopping</a><br>";
     }
     
     print_r($_SESSION["scart"]);
@@ -36,6 +40,6 @@
         <link rel="stylesheet" href="css/styles.css" type="text/css" />
     </head>
     <body>
-
+        
     </body>
 </html>
