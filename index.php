@@ -23,7 +23,17 @@
                 $newItem["price"] = $_POST["itemPrice"];
                 array_push($_SESSION["scart"], $newItem);
             }
-            header("Location: index.php?catId=".$_GET["catId"]."&submit=".$_GET["submit"]);
+            if (!empty(getCategoryId())) {
+                $catId = getCategoryId();
+            } else {
+                $catId = $_POST["itemCatId"];
+            }
+            if (!empty($_GET["playerName"])) {
+                $playerName = $_GET["playerName"];
+            } else {
+                $playerName = "";
+            }
+            header("Location: index.php?playerName=$playerName&catId=$catId&submit=".$_GET["submit"]);
         }
     }
     
@@ -40,54 +50,91 @@
         $stmt->execute();
         $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
+        $i = 1;
         foreach ($records as $record) {
-            echo "<option value='".$record["catId"]."' ".selectCategory($record["catId"]).">".$record["catName"] . "</option>";
+            if (!empty(getCategoryId())) {
+                if ($i == getCategoryId()) {
+                    $selected = "selected";
+                } else {
+                    $selected = "";
+                }
+            } else {
+                $selected = selectCategory($record["catId"]);
+            }
+            
+            echo "<option value='".$record['catId']."' ".$selected.">".$record['catName'] . "</option>";
+            $i++;
         }
+    }
+    
+    function getCategoryId() {
+        global $dbConn;
+        $playerName = $_GET["playerName"];
+        if (!empty($playerName)) {
+            $sql = "SELECT * FROM sports_players
+                    WHERE playerName = '$playerName'";
+            $stmt = $dbConn->prepare($sql);
+            $stmt->execute();
+            $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // echo $sql;
+            // print_r($records);
+            $categoryId = $records[0]["catId"];
+        }
+        return $categoryId;
     }
     
     function displaySportPlayers() {
         global $dbConn;
+        $playerName = $_GET["playerName"];
+        $catId = $_GET["catId"];
+        $newCatId = getCategoryId();
         
-        switch ($_GET["catId"]) {
-            case "1":
-                $table = "sports_football";
-                break;
-            case "2":
-                $table = "sports_baseball";
-                break;
-            case "3":
-                $table = "sports_basketball";
-                break;
-            case "4":
-                $table = "sports_golf";
-                break;
-            default:
-                $table = "";
+        if (!empty($playerName)) {
+            $sql = "SELECT * FROM sports_players
+                    WHERE playerName = '$playerName'";
+        } else {
+            $sql = "";
         }
-        if (!empty($table)) {
-            $sql = "SELECT * FROM $table";
+        if (!empty($newCatId)) {
+            $catId = $newCatId;
+        }
+        if (!empty($sql)) {
+            if (!empty($catId)) {
+                $sql .= " AND catId = $catId";
+            }
+        } else {
+            if (!empty($catId)) {
+                $sql .= "SELECT * FROM sports_players
+                    WHERE catId = $catId";
+            }
+        }
+        if (!empty($sql)) {
+            // echo $sql."<br>";
             $stmt = $dbConn->prepare($sql);
             $stmt->execute();
             $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
             // print_r($records);
-            
-            foreach ($records as $record) {
-                $itemId = $record["playerId"];
-                $itemCatId = $record["catId"];
-                $itemName = $record["playerName"];
-                $itemImage = $record["playerImage"];
-                $itemPrice = $record["price"];
-                echo "<tr>";
-                echo "<td><a href='playerInfo.php?name=$itemName&image=".$itemImage."'>".$itemName."</a></td>";
-                echo "<td><form id='add' method='POST'>
-                <input type='hidden' name='itemId' value='$itemId'>
-                <input type='hidden' name='itemCatId' value='$itemCatId'>
-                <input type='hidden' name='itemName' value='$itemName'>
-                <input type='hidden' name='itemImage' value='$itemImage'>
-                <input type='hidden' name='itemPrice' value='$itemPrice'>
-                <input type='submit' value='Add'>
-                </form></td>";
-                echo "</tr>";
+            if (empty($records)) {
+                echo "<span class='error'>Player not found. Try again</span><br>";
+            } else {
+                foreach ($records as $record) {
+                    $itemId = $record["playerId"];
+                    $itemCatId = $record["catId"];
+                    $itemName = $record["playerName"];
+                    $itemImage = $record["playerImage"];
+                    $itemPrice = $record["price"];
+                    echo "<tr>";
+                    echo "<td><a href='playerInfo.php?name=$itemName&image=".$itemImage."'>".$itemName."</a></td>";
+                    echo "<td><form id='add' method='POST'>
+                    <input type='hidden' name='itemId' value='$itemId'>
+                    <input type='hidden' name='itemCatId' value='$itemCatId'>
+                    <input type='hidden' name='itemName' value='$itemName'>
+                    <input type='hidden' name='itemImage' value='$itemImage'>
+                    <input type='hidden' name='itemPrice' value='$itemPrice'>
+                    <input type='submit' value='Add'>
+                    </form></td>";
+                    echo "</tr>";
+                }
             }
         }
     }
@@ -102,6 +149,7 @@
     <body>
         <a href="scart.php">Cart</a> <br><br>
         <form>
+            Player Name: <input type="text" name="playerName" value="<?=$_GET['playerName']?>"><br>
             Sport: 
             <select name="catId">
                 <option value="">- None -</option>
