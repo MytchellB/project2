@@ -3,6 +3,10 @@
     include "dbConnection.php";
     $dbConn = getDatabaseConnection("sports");
     
+    if (!isset($_SESSION["ids"])) {
+        $_SESSION["ids"] = array();
+    }
+    
     if (!isset($_SESSION["scart"])) {
         $_SESSION["scart"] = array();
     } else {
@@ -22,6 +26,7 @@
                 $newItem["image"] = $_POST["itemImage"];
                 $newItem["price"] = $_POST["itemPrice"];
                 array_push($_SESSION["scart"], $newItem);
+                array_push($_SESSION["ids"], $_POST["itemId"]);
             }
             if (!empty(getCategoryId())) {
                 $catId = getCategoryId();
@@ -38,9 +43,17 @@
                 $orderBy = $_GET["orderBy"];
                 $location .= "&orderBy=$orderBy";
             }
+            if (isset($_GET["sortBy"])) {
+                $sortBy = $_GET["sortBy"];
+                $location .= "&sortBy=$sortBy";
+            }
             if (isset($_GET["team"])) {
                 $team = $_GET["team"];
                 $location .= "&team=$team";
+            }
+            if (isset($_GET["addSingle"])) {
+                $single = $_GET["addSingle"];
+                $location .= "&addSingle=$single";
             }
             header($location);
         }
@@ -54,6 +67,12 @@
     
     function checkRadio($orderBy) {
         if ($_GET["orderBy"] == $orderBy) {
+            echo "checked";
+        }
+    }
+    
+    function checkSortRadio($sortBy) {
+        if ($_GET["sortBy"] == $sortBy) {
             echo "checked";
         }
     }
@@ -110,6 +129,10 @@
         $catId = $_GET["catId"];
         $newCatId = getCategoryId();
         $orderBy = $_GET["orderBy"];
+        $sortBy = "ASC";
+        if (isset($_GET["sortBy"])) {
+            $sortBy = $_GET["sortBy"];
+        }
         
         if (!empty($playerName)) {
             $sql = "SELECT * FROM sports_players
@@ -125,14 +148,14 @@
                 $sql .= " AND catId = $catId";
             }
             if (isset($orderBy)) {
-                $sql .= " ORDER BY $orderBy";
+                $sql .= " ORDER BY $orderBy $sortBy";
             }
         } else {
             if (!empty($catId)) {
                 $sql .= "SELECT * FROM sports_players
                     WHERE catId = $catId";
                 if (isset($orderBy)) {
-                    $sql .= " ORDER BY $orderBy";
+                    $sql .= " ORDER BY $orderBy $sortBy";
                 }
             }
         }
@@ -145,6 +168,12 @@
             if (empty($records)) {
                 echo "<span class='error'>Player not found. Try again</span><br>";
             } else {
+                echo "<tr>";
+                echo "<th>Name</th>";
+                if (isset($_GET["team"])) {
+                    echo "<th>Team</th>";
+                }
+                echo "<th>Price</th>";
                 foreach ($records as $record) {
                     $itemId = $record["playerId"];
                     $itemCatId = $record["catId"];
@@ -155,16 +184,14 @@
                     echo "<tr>";
                     echo "<td><a href='playerInfo.php?name=$itemName&image=".$itemImage."'>".$itemName."</a></td>";
                     if (isset($_GET["team"])) {
-                        if (!empty($itemTeam)) {
-                            echo "<td>$itemTeam</td>";
-                        }
+                        echo "<td>$itemTeam</td>";
                     }
                     if ($_GET["id"] == $itemId) {
                         $class = "added";
                         $value = "Added";
                     } else {
                         $class = "";
-                        $value = "Add";
+                        $value = "$$itemPrice";
                     }
                     echo "<td><form id='add' method='POST'>
                     <input type='hidden' name='itemId' value='$itemId'>
@@ -201,15 +228,74 @@
             <label for="teamOrd">Player Team</label>
             <input type="radio" id="nameOrd" name="orderBy" value="playerName" <?=checkRadio("playerName")?>>
             <label for="nameOrd">Player Name</label><br>
-            <label for="team">Display player's team</label>
+            Sort Results By:
+            <input type="radio" id="asc" name="sortBy" value="ASC" <?=checkSortRadio("ASC")?>>
+            <label for="asc">ASC</label>
+            <input type="radio" id="desc" name="sortBy" value="DESC" <?=checkSortRadio("DESC")?>>
+            <label for="desc">DESC</label><br>
+            <label for="team">Display player's team name</label>
             <input type="checkbox" id="team" name="team" <?=checkCheckBox()?>><br><br>
             <input type="submit" name="submit" value="Submit">
         </form><br>
+        <?php
+            if (isset($_GET["submit"])) {
+                if (empty($_GET["catId"]) && empty(getCategoryId()) && empty($_GET["playerName"])) {
+                    echo "<span class='error'>Please enter a player name or select a sport</span><br><br>";
+                }
+                if (!isset($_GET["orderBy"]) && isset($_GET["sortBy"])) {
+                    echo "<span class='warning'>Please select a Order Results By option and try again.</span><br><br>";
+                }
+            }
+        ?>
+        
+        <span id="clickSubmit">After modifying search results, click submit<br>then add your items to the cart.</span><br><br>
         
         <table>
         <?php
             if (isset($_GET["submit"])) {
-                displaySportPlayers();
+                if (empty($_GET["playerName"]) && !empty($_GET["catId"])) {
+                    if (!empty(getCategoryId())) {
+                        $catId = getCategoryId();
+                    } else {
+                        $catId = $_GET["catId"];
+                    }
+                    switch ($catId) {
+                        case 1:
+                            $sport = "football";
+                            break;
+                        case 2:
+                            $sport = "baseball";
+                            break;
+                        case 3:
+                            $sport = "basketball";
+                            break;
+                        case 4:
+                            $sport = "golf";
+                            break;
+                    }
+                    $link = "addAllPlayers.php?catId=".$_GET["catId"]."&submit=".$_GET["submit"];
+                    $link2 = "index.php?catId=".$_GET["catId"]."&submit=".$_GET["submit"]."&addSingle=1";
+                    
+                    if (isset($_GET["orderBy"])) {
+                        $link .= "&orderBy=".$_GET["orderBy"];
+                        $link2 .= "&orderBy=".$_GET["orderBy"];
+                    }
+                    if (isset($_GET["sortBy"])) {
+                        $link .= "&sortBy=".$_GET["sortBy"];
+                        $link2 .= "&sortBy=".$_GET["sortBy"];
+                    }
+                    if (isset($_GET["team"])) {
+                        $link .= "&team=".$_GET["team"];
+                        $link2 .= "&team=".$_GET["team"];
+                    }
+                    echo "<button><a href='$link'>Add all players of $sport to cart</a></button><br><br>";
+                    echo "<button><a href='$link2'>Add individual players of $sport to cart</a></button>";
+                    if (isset($_GET["addSingle"])) {
+                        displaySportPlayers();
+                    }
+                } else {
+                    displaySportPlayers();
+                }
             }
         ?>
         </table>
