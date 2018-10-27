@@ -52,11 +52,13 @@
         <link rel="stylesheet" href="css/styles.css" type="text/css" />
     </head>
     <body>
-        <div>
-        <form class="button" method='POST'>
-            <input type='submit' name='removeBtn' value='Empty Cart'>
-        </form>
-        <form id="purchaseProd" class="button" method='POST' action='purchaseProduct.php'>
-        <?= displayShopCart() ?>
+        <div id="main2">
+            <div>
+            <form class="button" method='POST'>
+                <input type='submit' name='removeBtn' value='Empty Cart'>
+            </form>
+            <form id="purchaseProd" class="button" method='POST' action='purchaseProduct.php'>
+            <?= displayShopCart() ?>
+        </div>
     </body>
 </html>
