@@ -216,91 +216,93 @@
         <link rel="stylesheet" href="css/styles.css" type="text/css" />
     </head>
     <body>
-        <a href="scart.php">Cart</a> <br><br>
-        <form>
-            Player Name: <input type="text" name="playerName" value="<?=$_GET['playerName']?>"><br>
-            Sport: 
-            <select name="catId">
-                <option value="">- None -</option>
-                <?= displayCategories() ?>
-            </select> <br>
-            Order Results By: 
-            <input type="radio" id="teamOrd" name="orderBy" value="playerTeam" <?=checkRadio("playerTeam")?>>
-            <label for="teamOrd">Player Team</label>
-            <input type="radio" id="nameOrd" name="orderBy" value="playerName" <?=checkRadio("playerName")?>>
-            <label for="nameOrd">Player Name</label><br>
-            Sort Results By:
-            <input type="radio" id="asc" name="sortBy" value="ASC" <?=checkSortRadio("ASC")?>>
-            <label for="asc">ASC</label>
-            <input type="radio" id="desc" name="sortBy" value="DESC" <?=checkSortRadio("DESC")?>>
-            <label for="desc">DESC</label><br>
-            <label for="team">Display player's team name</label>
-            <input type="checkbox" id="team" name="team" <?=checkCheckBox()?>><br><br>
-            <input type="submit" name="submit" value="Submit">
-        </form><br>
-        <?php
-            if (isset($_GET["submit"])) {
-                if (empty($_GET["catId"]) && empty(getCategoryId()) && empty($_GET["playerName"])) {
-                    echo "<span class='error'>Please enter a player name or select a sport</span><br><br>";
+        <main>
+            <a href="scart.php" id="cartButton">Cart</a> <br><br>
+            <form>
+                Player Name: <input type="text" name="playerName" value="<?=$_GET['playerName']?>"><br>
+                Sport: 
+                <select name="catId">
+                    <option value="">- None -</option>
+                    <?= displayCategories() ?>
+                </select> <br>
+                Order Results By: 
+                <input type="radio" id="teamOrd" name="orderBy" value="playerTeam" <?=checkRadio("playerTeam")?>>
+                <label for="teamOrd">Player Team</label>
+                <input type="radio" id="nameOrd" name="orderBy" value="playerName" <?=checkRadio("playerName")?>>
+                <label for="nameOrd">Player Name</label><br>
+                Sort Results By:
+                <input type="radio" id="asc" name="sortBy" value="ASC" <?=checkSortRadio("ASC")?>>
+                <label for="asc">ASC</label>
+                <input type="radio" id="desc" name="sortBy" value="DESC" <?=checkSortRadio("DESC")?>>
+                <label for="desc">DESC</label><br>
+                <label for="team">Display player's team name</label>
+                <input type="checkbox" id="team" name="team" <?=checkCheckBox()?>><br><br>
+                <input type="submit" name="submit" value="Submit">
+            </form><br>
+            <?php
+                if (isset($_GET["submit"])) {
+                    if (empty($_GET["catId"]) && empty(getCategoryId()) && empty($_GET["playerName"])) {
+                        echo "<span class='error'>Please enter a player name or select a sport</span><br><br>";
+                    }
+                    if (!isset($_GET["orderBy"]) && isset($_GET["sortBy"])) {
+                        echo "<span class='warning'>Please select a Order Results By option and try again.</span><br><br>";
+                    }
                 }
-                if (!isset($_GET["orderBy"]) && isset($_GET["sortBy"])) {
-                    echo "<span class='warning'>Please select a Order Results By option and try again.</span><br><br>";
-                }
-            }
-        ?>
-        
-        <span id="clickSubmit">After modifying search results, click submit<br>then add your items to the cart.</span><br><br>
-        
-        <div id="playersTable">
-        <table align="center">
-        <?php
-            if (isset($_GET["submit"])) {
-                if (empty($_GET["playerName"]) && !empty($_GET["catId"])) {
-                    if (!empty(getCategoryId())) {
-                        $catId = getCategoryId();
+            ?>
+            
+            <span id="clickSubmit">After modifying search results, click submit<br>then add your items to the cart.</span><br><br>
+            
+            <div id="playersTable">
+            <table align="center">
+            <?php
+                if (isset($_GET["submit"])) {
+                    if (empty($_GET["playerName"]) && !empty($_GET["catId"])) {
+                        if (!empty(getCategoryId())) {
+                            $catId = getCategoryId();
+                        } else {
+                            $catId = $_GET["catId"];
+                        }
+                        switch ($catId) {
+                            case 1:
+                                $sport = "football";
+                                break;
+                            case 2:
+                                $sport = "baseball";
+                                break;
+                            case 3:
+                                $sport = "basketball";
+                                break;
+                            case 4:
+                                $sport = "golf";
+                                break;
+                        }
+                        $link = "addAllPlayers.php?catId=".$_GET["catId"]."&submit=".$_GET["submit"];
+                        $link2 = "index.php?catId=".$_GET["catId"]."&submit=".$_GET["submit"]."&addSingle=1";
+                        
+                        if (isset($_GET["orderBy"])) {
+                            $link .= "&orderBy=".$_GET["orderBy"];
+                            $link2 .= "&orderBy=".$_GET["orderBy"];
+                        }
+                        if (isset($_GET["sortBy"])) {
+                            $link .= "&sortBy=".$_GET["sortBy"];
+                            $link2 .= "&sortBy=".$_GET["sortBy"];
+                        }
+                        if (isset($_GET["team"])) {
+                            $link .= "&team=".$_GET["team"];
+                            $link2 .= "&team=".$_GET["team"];
+                        }
+                        echo "<button><a href='$link'>Add all players of $sport to cart</a></button><br><br>";
+                        echo "<button><a href='$link2'>Add individual players of $sport to cart</a></button>";
+                        if (isset($_GET["addSingle"])) {
+                            displaySportPlayers();
+                        }
                     } else {
-                        $catId = $_GET["catId"];
-                    }
-                    switch ($catId) {
-                        case 1:
-                            $sport = "football";
-                            break;
-                        case 2:
-                            $sport = "baseball";
-                            break;
-                        case 3:
-                            $sport = "basketball";
-                            break;
-                        case 4:
-                            $sport = "golf";
-                            break;
-                    }
-                    $link = "addAllPlayers.php?catId=".$_GET["catId"]."&submit=".$_GET["submit"];
-                    $link2 = "index.php?catId=".$_GET["catId"]."&submit=".$_GET["submit"]."&addSingle=1";
-                    
-                    if (isset($_GET["orderBy"])) {
-                        $link .= "&orderBy=".$_GET["orderBy"];
-                        $link2 .= "&orderBy=".$_GET["orderBy"];
-                    }
-                    if (isset($_GET["sortBy"])) {
-                        $link .= "&sortBy=".$_GET["sortBy"];
-                        $link2 .= "&sortBy=".$_GET["sortBy"];
-                    }
-                    if (isset($_GET["team"])) {
-                        $link .= "&team=".$_GET["team"];
-                        $link2 .= "&team=".$_GET["team"];
-                    }
-                    echo "<button><a href='$link'>Add all players of $sport to cart</a></button><br><br>";
-                    echo "<button><a href='$link2'>Add individual players of $sport to cart</a></button>";
-                    if (isset($_GET["addSingle"])) {
                         displaySportPlayers();
                     }
-                } else {
-                    displaySportPlayers();
                 }
-            }
-        ?>
-        </table>
-        </div>
+            ?>
+            </table>
+            </div>
+        </main>
     </body>
 </html>
