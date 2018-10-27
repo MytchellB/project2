@@ -165,6 +165,7 @@
             $stmt->execute();
             $records = $stmt->fetchAll(PDO::FETCH_ASSOC);
             // print_r($records);
+            
             if (empty($records)) {
                 echo "<span class='error'>Player not found. Try again</span><br>";
             } else {
@@ -250,7 +251,8 @@
         
         <span id="clickSubmit">After modifying search results, click submit<br>then add your items to the cart.</span><br><br>
         
-        <table>
+        <div id="playersTable">
+        <table align="center">
         <?php
             if (isset($_GET["submit"])) {
                 if (empty($_GET["playerName"]) && !empty($_GET["catId"])) {
@@ -299,5 +301,6 @@
             }
         ?>
         </table>
+        </div>
     </body>
 </html>
