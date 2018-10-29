@@ -1,7 +1,7 @@
 <?php
     session_start();
     
-     // print_r($_SESSION["scart"]);
+    // print_r($_SESSION["scart"]);
      
     if (isset($_POST["removeBtn"])) {
         session_unset();
@@ -48,33 +48,15 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Checkout</title>
+        <title> </title>
         <link rel="stylesheet" href="css/styles.css" type="text/css" />
     </head>
     <body>
-        <h1>Shopping Cart</h1> <br><br>
-        <h3>Items</h3><br><br>
-        <table>
-            <tr>
-            <th>Player Name</th>
-            <th>Team</th>
-            <th>Position</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            </tr>
-            
-            <tr>
-                <td>first column</td>
-            </tr>
-            <td>Last Column</td>
-            
-        </table>
-        <form>
-                <input type="submit" value="Remove"/>
-                <input type="submit" value="Add"/>
-                <br><br>
-                <input type="submit" value="Purchase"/> 
-            </form>
-        
+        <div>
+        <form class="button" method='POST'>
+            <input type='submit' name='removeBtn' value='Empty Cart'>
+        </form>
+        <form id="purchaseProd" class="button" method='POST' action='purchaseProduct.php'>
+        <?= displayShopCart() ?>
     </body>
 </html>
