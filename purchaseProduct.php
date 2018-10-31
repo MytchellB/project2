@@ -8,21 +8,25 @@
     } else {
         if (!empty($_SESSION["scart"])) {
             header("Location: scart.php");
+            exit();
         } else {
             header("Location: index.php");
+            exit();
         }
     }
     
-    for ($j = 0; $j < count($_SESSION["scart"]); $j++) {
-        $_SESSION["scart"][$j]["quant"] = $_POST["quant".$j];
-        $_SESSION["scart"][$j]["price"] = $_SESSION["scart"][$j]["quant"] * $_SESSION["scart"][$j]["price"];
-        
-        $sql = "UPDATE sports_purchase
-                SET quantity = quantity + ".$_SESSION["scart"][$j]["quant"].
-                " WHERE playerId = ".$_SESSION["scart"][$j]["id"];
-        // echo $sql."<br>";
-        $stmt = $dbConn->prepare($sql);
-        $stmt->execute();
+    if (isset($_SESSION["scart"])) {
+        for ($j = 0; $j < count($_SESSION["scart"]); $j++) {
+            $_SESSION["scart"][$j]["quant"] = $_POST["quant".$j];
+            $_SESSION["scart"][$j]["price"] = $_SESSION["scart"][$j]["quant"] * $_SESSION["scart"][$j]["price"];
+            
+            $sql = "UPDATE sports_purchase
+                    SET quantity = quantity + ".$_SESSION["scart"][$j]["quant"].
+                    " WHERE playerId = ".$_SESSION["scart"][$j]["id"];
+            // echo $sql."<br>";
+            $stmt = $dbConn->prepare($sql);
+            $stmt->execute();
+        }
     }
     
     // $sql = "UPDATE sports_purchase
