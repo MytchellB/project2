@@ -40,12 +40,12 @@
     if (isset($_SESSION["scart"])) {
         $_SESSION["subtotal"] = 0;
         foreach ($_SESSION["scart"] as $item) {
-            $price = $item["quant"] * $item["price"];
+            $price = $item["price"];
             $_SESSION["subtotal"] += $price;
         }
     }
     $_SESSION["salestax"] = 0.0725*$_SESSION["subtotal"];
-    $_SESSION["total"] = $_SESSIION["salestax"] + $_SESSION["subtotal"];
+    $_SESSION["total"] = $_SESSION["salestax"] + $_SESSION["subtotal"];
     echo "Thank you for shopping with us!<br>Order Summary:<br>";
     echo "Subtotal: $".$_SESSION["subtotal"]."<br>";
     echo "Sales Tax: $".$_SESSION["salestax"]."<br>";
