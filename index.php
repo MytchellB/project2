@@ -147,6 +147,12 @@
             if (!empty($catId)) {
                 $sql .= " AND catId = $catId";
             }
+            if (isset($_GET['priceFrom'])) {
+                    $sql .= " AND price >= " . $_GET['priceFrom'];
+            }
+            if (isset($_GET['priceTo'])) {
+                    $sql .= " AND price <= " . $_GET['priceTo'];
+            }
             if (isset($orderBy)) {
                 $sql .= " ORDER BY $orderBy $sortBy";
             }
@@ -154,6 +160,12 @@
             if (!empty($catId)) {
                 $sql .= "SELECT * FROM sports_players
                     WHERE catId = $catId";
+                if (!empty($_GET['priceFrom'])) {
+                    $sql .= " AND price >= " . $_GET['priceFrom'];
+                }
+                if (!empty($_GET['priceTo'])) {
+                    $sql .= " AND price <= " . $_GET['priceTo'];
+                }
                 if (isset($orderBy)) {
                     $sql .= " ORDER BY $orderBy $sortBy";
                 }
@@ -225,6 +237,9 @@
                     <option value="">- None -</option>
                     <?= displayCategories() ?>
                 </select> <br>
+                Price From: <input type="number" name="priceFrom"  /><br> 
+                Price To: <input type="number" name="priceTo"  />
+                <br>
                 Order Results By: 
                 <input type="radio" id="teamOrd" name="orderBy" value="playerTeam" <?=checkRadio("playerTeam")?>>
                 <label for="teamOrd">Player Team</label>
@@ -290,6 +305,14 @@
                         if (isset($_GET["team"])) {
                             $link .= "&team=".$_GET["team"];
                             $link2 .= "&team=".$_GET["team"];
+                        }
+                        if (!empty($_GET["priceFrom"])) {
+                            $link .= "&priceFrom=".$_GET["priceFrom"];
+                            $link2 .= "&priceFrom=".$_GET["priceFrom"];
+                        }
+                        if (!empty($_GET["priceTo"])) {
+                            $link .= "&priceTo=".$_GET["priceTo"];
+                            $link2 .= "&priceTo=".$_GET["priceTo"];
                         }
                         echo "<button><a href='$link'>Add all players of $sport to cart</a></button><br><br>";
                         echo "<button><a href='$link2'>Add individual players of $sport to cart</a></button>";

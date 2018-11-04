@@ -3,6 +3,7 @@
     include "dbConnection.php";
     $dbConn = getDatabaseConnection("sports");
     
+    
     for ($j = 0; $j < count($_SESSION["scart"]); $j++) {
         $_SESSION["scart"][$j]["quant"] = $_POST["quant".$j];
         

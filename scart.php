@@ -33,6 +33,7 @@
                     $j++;
                 }
                 echo "</tr>";
+                
                 $subtotal += $item['price'];
             }
             $salestax = 0.0725*$subtotal;
