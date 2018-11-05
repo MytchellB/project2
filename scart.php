@@ -2,10 +2,14 @@
     session_start();
     
     // print_r($_SESSION["scart"]);
+    
+    if ($_SESSION["purchaseItem"]) {
+        header("Location: index.php");
+    }
      
     if (isset($_POST["removeBtn"])) {
-        session_unset();
-        session_destroy();
+        unset($_SESSION["scart"]);
+        unset($_SESSION["ids"]);
         header("Location: index.php");
     }
     
@@ -15,11 +19,15 @@
     // echo "<form class='button' method='POST' action='purchaseProduct.php'>";
     
     function displayShopCart() {
-        $subtotal = 0;
+        // $subtotal = 0;
         if (!empty($_SESSION["scart"])) {
-            echo "<input type='submit' name='submit' value='Purchase Product(s)'>";
-            echo "</div><br>";
-            echo "<table id='cart'>";
+            echo "<form id='emptyCart' class='button' method='POST'>
+                    <input type='submit' name='removeBtn' value='Empty Cart'>
+                </form>
+                <form id='purchaseProd' class='button' method='POST' action='purchaseProduct.php'>";
+            echo "<input type='submit' name='submit' value='Purchase Product(s)'><br><br>";
+            // echo "</div><br><br>";
+            echo "<table class='cart'>";
             $j = 0;
             foreach ($_SESSION["scart"] as $item) {
                 echo "<tr>";
@@ -33,16 +41,18 @@
                     $j++;
                 }
                 echo "</tr>";
-                
                 $subtotal += $item['price'];
+
             }
-            $salestax = 0.0725*$subtotal;
-            $total = $subtotal + $salestax;
-            echo "<tr><td id='purchase' colspan='8' style='text-align: center;'>Subtotal: $$subtotal<br>
-            Sales Tax: $$salestax<br>Total: $$total</td></tr>";
+            // $salestax = 0.0725*$subtotal;
+            // $total = $subtotal + $salestax;
+            // echo "<tr><td id='purchase' colspan='8' style='text-align: center;'>Subtotal: $$subtotal<br>
+            // Sales Tax: $$salestax<br>Total: $$total</td></tr>";
             echo "</table>";
+            echo "</form>";
+        } else {
+            echo "<h1 style='color:red;'>Cart is empty</h1>";
         }
-        echo "</form>";
     }
 ?>
 
@@ -54,13 +64,14 @@
         <link rel="stylesheet" href="css/styles.css" type="text/css" />
     </head>
     <body>
-        <div id="main2">
+        <div class="main2">
             <div>
-            <form class="button" method='POST'>
-                <input type='submit' name='removeBtn' value='Empty Cart'>
-            </form>
-            <form id="purchaseProd" class="button" method='POST' action='purchaseProduct.php'>
-            <?= displayShopCart() ?>
+                <!--<form id="emptyCart" class="button" method='POST'>-->
+                <!--    <input type='submit' name='removeBtn' value='Empty Cart'>-->
+                <!--</form>-->
+                <!--<form id="purchaseProd" class="button" method='POST' action='purchaseProduct.php'>-->
+                <?php displayShopCart(); ?>
+            </div>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>

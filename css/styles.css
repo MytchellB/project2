@@ -12,10 +12,23 @@ main {
     font-size: 1.25em;
 }
 
-#main2 {
+.main2 {
     background-color: rgba(255,255,255,0.85);
     padding-top: 25px;
+    padding-bottom: 25px;
     margin: 0 auto;
+}
+
+.main2 #emptyCart {
+    text-align: left;
+}
+
+.main2 #purchaseProd {
+    text-align: right;
+}
+
+.main2 #clearHist {
+    text-align: left;
 }
 
 #playersTable {
@@ -26,14 +39,27 @@ main {
     font-size: 2em;
 }
 
+#cartPreview {
+    float: right;
+    font-size: 0.8em;
+}
+
+ul li {
+    list-style-type: square;
+}
+
+form {
+    clear: right;
+}
+
 table {
     margin-top: 15px;
     padding-bottom: 25px;
 }
 
-.button {
-    display: inline-block;
-}
+/*.button {*/
+/*    display: inline-block;*/
+/*}*/
 
 .error {
     font-size: 20px;
@@ -62,15 +88,16 @@ th {
     font-style: italic;
 }
 
-#cart {
+.cart {
     border: 1px solid black;
     margin: 0 auto;
 }
 
-#cart td {
+.cart td {
     border-bottom: 1px solid #ddd;
 }
 
-#purchaseProd {
-    float: right;
+.noHistory {
+    text-align: center;
+    color: red;
 }
