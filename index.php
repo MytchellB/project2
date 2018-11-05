@@ -3,19 +3,8 @@
     include "dbConnection.php";
     $dbConn = getDatabaseConnection("sports");
     
-    $_SESSION["purchaseItem"] = false;
-    
-    if (isset($_POST["clearHist"])) {
-        unset($_SESSION["shopHist"]);
-        header("Location: index.php");
-    }
-    
     if (!isset($_SESSION["ids"])) {
         $_SESSION["ids"] = array();
-    }
-    
-    if (!isset($_SESSION["shopHist"])) {
-        $_SESSION["shopHist"] = array();
     }
     
     if (!isset($_SESSION["scart"])) {
@@ -242,27 +231,7 @@
     </head>
     <body>
         <main>
-            <a href="scart.php" id="cartButton">Cart</a> <br>
-            <div id="cartPreview">
-            <ul>
-                <?php
-                    for ($i = 0; $i < 3; $i++) {
-                        if (isset($_SESSION["scart"][$i])) {
-                            if ($i == 0) {
-                                echo "Cart Preview<br>";
-                            }
-                            echo "<li>".$_SESSION["scart"][$i]["name"]." | $".$_SESSION["scart"][$i]["price"]."</li>";
-                        }
-                    }
-                ?>
-            </ul>
-                <?php
-                    if (count($_SESSION["scart"]) > 3) {
-                        echo "<h4>Click cart for more</h4>";
-                    }
-                ?>
-            </div>
-            
+            <a href="scart.php" id="cartButton">Cart</a> <br><br>
             <form>
                 Player Name: <input type="text" name="playerName" value="<?=$_GET['playerName']?>"><br>
                 Sport: 
@@ -299,7 +268,6 @@
             ?>
             
             <span id="clickSubmit">After modifying search results, click submit<br>then add your items to the cart.</span><br><br>
-            <a href="shopHist.php">Purchase History</a>
             
             <div id="playersTable">
             <table align="center">
