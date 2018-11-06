@@ -3,19 +3,8 @@
     include "dbConnection.php";
     $dbConn = getDatabaseConnection("sports");
     
-    $_SESSION["purchaseItem"] = false;
-    
-    if (isset($_POST["clearHist"])) {
-        unset($_SESSION["shopHist"]);
-        header("Location: index.php");
-    }
-    
     if (!isset($_SESSION["ids"])) {
         $_SESSION["ids"] = array();
-    }
-    
-    if (!isset($_SESSION["shopHist"])) {
-        $_SESSION["shopHist"] = array();
     }
     
     if (!isset($_SESSION["scart"])) {
@@ -158,6 +147,12 @@
             if (!empty($catId)) {
                 $sql .= " AND catId = $catId";
             }
+            if (isset($_GET['priceFrom'])) {
+                    $sql .= " AND price >= " . $_GET['priceFrom'];
+            }
+            if (isset($_GET['priceTo'])) {
+                    $sql .= " AND price <= " . $_GET['priceTo'];
+            }
             if (isset($orderBy)) {
                 $sql .= " ORDER BY $orderBy $sortBy";
             }
@@ -165,6 +160,12 @@
             if (!empty($catId)) {
                 $sql .= "SELECT * FROM sports_players
                     WHERE catId = $catId";
+                if (!empty($_GET['priceFrom'])) {
+                    $sql .= " AND price >= " . $_GET['priceFrom'];
+                }
+                if (!empty($_GET['priceTo'])) {
+                    $sql .= " AND price <= " . $_GET['priceTo'];
+                }
                 if (isset($orderBy)) {
                     $sql .= " ORDER BY $orderBy $sortBy";
                 }
@@ -224,31 +225,13 @@
 <html>
     <head>
         <title>Sports Cards</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
         <link rel="stylesheet" href="css/styles.css" type="text/css" />
+
     </head>
     <body>
         <main>
-            <a href="scart.php" id="cartButton">Cart</a> <br>
-            <div id="cartPreview">
-            <ul>
-                <?php
-                    for ($i = 0; $i < 3; $i++) {
-                        if (isset($_SESSION["scart"][$i])) {
-                            if ($i == 0) {
-                                echo "Cart Preview<br>";
-                            }
-                            echo "<li>".$_SESSION["scart"][$i]["name"]." | $".$_SESSION["scart"][$i]["price"]."</li>";
-                        }
-                    }
-                ?>
-            </ul>
-                <?php
-                    if (count($_SESSION["scart"]) > 3) {
-                        echo "<h4>Click cart for more</h4>";
-                    }
-                ?>
-            </div>
-            
+            <a href="scart.php" id="cartButton">Cart</a> <br><br>
             <form>
                 Player Name: <input type="text" name="playerName" value="<?=$_GET['playerName']?>"><br>
                 Sport: 
@@ -256,6 +239,9 @@
                     <option value="">- None -</option>
                     <?= displayCategories() ?>
                 </select> <br>
+                Price From: <input type="number" name="priceFrom"  /><br> 
+                Price To: <input type="number" name="priceTo"  />
+                <br>
                 Order Results By: 
                 <input type="radio" id="teamOrd" name="orderBy" value="playerTeam" <?=checkRadio("playerTeam")?>>
                 <label for="teamOrd">Player Team</label>
@@ -282,7 +268,6 @@
             ?>
             
             <span id="clickSubmit">After modifying search results, click submit<br>then add your items to the cart.</span><br><br>
-            <a href="shopHist.php">Purchase History</a>
             
             <div id="playersTable">
             <table align="center">
@@ -323,6 +308,14 @@
                             $link .= "&team=".$_GET["team"];
                             $link2 .= "&team=".$_GET["team"];
                         }
+                        if (!empty($_GET["priceFrom"])) {
+                            $link .= "&priceFrom=".$_GET["priceFrom"];
+                            $link2 .= "&priceFrom=".$_GET["priceFrom"];
+                        }
+                        if (!empty($_GET["priceTo"])) {
+                            $link .= "&priceTo=".$_GET["priceTo"];
+                            $link2 .= "&priceTo=".$_GET["priceTo"];
+                        }
                         echo "<button><a href='$link'>Add all players of $sport to cart</a></button><br><br>";
                         echo "<button><a href='$link2'>Add individual players of $sport to cart</a></button>";
                         if (isset($_GET["addSingle"])) {
@@ -336,5 +329,7 @@
             </table>
             </div>
         </main>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
     </body>
 </html>
